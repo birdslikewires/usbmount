@@ -53,7 +53,7 @@ VERBOSE="no"
 BLKID="/sbin/blkid"
 UDEVADM="/bin/udevadm"
 USBMOUNT_CONF="/etc/usbmount/usbmount.conf"
-USBMOUNT_VAR="/var/run/usbmount/"
+USBMOUNT_VAR="/var/run/usbmount"
 
 if [ -r "${USBMOUNT_CONF}" ]; then
 	# shellcheck source=usbmount.conf
@@ -102,7 +102,7 @@ if [ "${1}" = "add" ]; then
 	# Grab device information from device
 	#   FIXME: improvement: implement mounting by label (notice that labels
 	#   can contain spaces, which makes things a little bit less comfortable).
-	eval "$("${BLKID}" -o value -p -s TYPE -s USAGE -s UUID "${DEVNAME}")"
+	eval $("${BLKID}" -o export -p -s TYPE -s USAGE -s UUID "${DEVNAME}")
 
 	if [ "${USAGE}" != "filesystem" ] && [ "${USAGE}" != "disklabel" ]; then
 		log info "${DEVNAME} does not contain a filesystem or disklabel"
@@ -151,25 +151,25 @@ if [ "${1}" = "add" ]; then
 				# Determine vendor and model.
 				vendor=
 				if [ -r "/sys${DEVPATH}/device/vendor" ]; then
-					vendor="$(cat \"/sys"${DEVPATH}"/device/vendor\")"
+					vendor=$(cat /sys"${DEVPATH}"/device/vendor)
 				elif [ -r "/sys${DEVPATH}/../device/vendor" ]; then
-					vendor="$(cat \"/sys"${DEVPATH}"/../device/vendor\")"
+					vendor=$(cat /sys"${DEVPATH}"/../device/vendor)
 				elif [ -r "/sys${DEVPATH}/device/../manufacturer" ]; then
-					vendor="$(cat \"/sys"${DEVPATH}"/device/../manufacturer\")"
+					vendor=$(cat /sys"${DEVPATH}"/device/../manufacturer)
 				elif [ -r "/sys${DEVPATH}/../device/../manufacturer" ]; then
-					vendor="$(cat \"/sys"${DEVPATH}"/../device/../manufacturer\")"
+					vendor=$(cat /sys"${DEVPATH}"/../device/../manufacturer)
 				fi
 				vendor="$(echo "${vendor}" | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//')"
 
 				model=
 				if [ -r "/sys${DEVPATH}/device/model" ]; then
-					model="$(cat \"/sys"${DEVPATH}"/device/model\")"
+					model=$(cat /sys"${DEVPATH}"/device/model)
 				elif [ -r "/sys${DEVPATH}/../device/model" ]; then
-					model="$(cat \"/sys"${DEVPATH}"/../device/model\")"
+					model=$(cat /sys"${DEVPATH}"/../device/model)
 				elif [ -r "/sys${DEVPATH}/device/../product" ]; then
-					model="$(cat \"/sys"${DEVPATH}"/device/../product\")"
+					model=$(cat \"/sys"${DEVPATH}"/device/../product)
 				elif [ -r "/sys${DEVPATH}/../device/../product" ]; then
-					model="$(cat \"/sys"${DEVPATH}"/../device/../product\")"
+					model=$(cat \"/sys"${DEVPATH}"/../device/../product)
 				fi
 				model="$(echo "${model}" | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//')"
 
